@@ -3,10 +3,9 @@ import json
 import pprint
 import pandas as pd
 
-
 def combination_data_change(csv_data):
     list = []
-    for i in range(1, len(csv_data)):
+    for i in range(0, len(csv_data)):
         num = 0
         str = csv_data['combination'][i]
         if str.find("Void") != -1:
@@ -127,10 +126,9 @@ def combination_data_change(csv_data):
         list.append(num)
     return list
 
-
 def champion_data_change(data):
     array = []
-    for i in range(1, len(data)):
+    for i in range(0, len(data)):
         price = 0
         str = data['champion'][i]
         list = str.split("}")
@@ -253,7 +251,7 @@ def champion_data_change(data):
 
 def item_change(csv_data):
     list_a = []
-    for i in range(1, len(csv_data)):
+    for i in range(0, len(csv_data)):
         num = 0
         step = 0
         count = 0
@@ -286,7 +284,6 @@ def item_change(csv_data):
         list_a.append(num)
     return list_a
 
-
 def load_match_data(filename):
     #filename is String
     names = ['gameId', 'gameDuration', 'level', 'lastRound', 'Ranked', 'ingameDuration', 'combination', 'champion']
@@ -294,12 +291,21 @@ def load_match_data(filename):
     csv_data.drop('gameId', axis=1, inplace=True)
     csv_data.drop('gameDuration', axis=1, inplace=True)
     csv_data.drop('ingameDuration', axis=1, inplace=True)
+    csv_data.drop(index = 0, axis = 0, inplace = True)
     csv_data.to_json("test.json", orient="records")
-    return csv_data
-
+    data = pd.read_json("test.json")
+    return data
 
 if __name__ == '__main__':
-    data = load_match_data("TFT_MatchData.csv")
-    #combination_data_change(data)
-    champion_data_change(data)
-    #item_change(data)
+    data = load_match_data("TFT_Challenger_MatchData.csv")
+    combination_score = combination_data_change(data)
+    champion_value = champion_data_change(data)
+    item_count = item_change(data)
+    df = pd.DataFrame()
+    df["level"] = data["level"]
+    df["lastRound"] = data["lastRound"]
+    df["Ranked"] = data["Ranked"]
+    df["item_count"] = item_count
+    df["champion_value"] = champion_value
+    df["combination_score"] = combination_score
+    print(df)
