@@ -1,16 +1,12 @@
 import csv
 import json
 import pprint
-
 import pandas as pd
 
-
-def combination_change(csv_data):
-    for i in range(1, 79999):
+def combination_data_change(csv_data):
+    for i in range(1, len(csv_data)):
         num = 0
         str = csv_data['combination'][i]
-        val = str.find("DarkStar")
-
         if str.find("Void") != -1:
             if int(str[str.find("Void") + 7]) >= 3:
                 num += 4
@@ -126,16 +122,177 @@ def combination_change(csv_data):
         if str.find("Demolitionist") != -1:
             if int(str[str.find("Demolitionist") + 16]) >= 2:
                 num += 4
-        print(csv_data['combination'][i])
+        #print(csv_data['combination'][i])
+        #print(num)
+
+def champion_data_change(data):
+    for i in range(1, len(data)):
+        price = 0
+        str = data['champion'][i]
+        list = str.split("}")
+        del list[-1]
+        del list[-1]
+        for v in list:
+            star = int(v[v.find("star") + 7])
+            if star == 3:
+                star = 9
+            elif star == 2:
+                star = 3
+            else:
+                star = 1
+            if v.find("Ahri") != -1:
+                price += 2*star
+            if v.find("Annie") != -1:
+                price += 2 * star
+            if v.find("Ashe") != -1:
+                price += 3*star
+            if v.find("AurelionSol") != -1:
+                price += 5*star
+            if v.find("Blitzcrank") != -1:
+                price += 2*star
+            if v.find("Caitlyn") != -1:
+                price += 1*star
+            if v.find("ChoGath") != -1:
+                price += 4*star
+            if v.find("Darius") != -1:
+                price += 2*star
+            if v.find("Ekko") != -1:
+                price += 5*star
+            if v.find("Ezreal") != -1:
+                price += 3*star
+            if v.find("Fiora") != -1:
+                price += 1*star
+            if v.find("Fizz") != -1:
+                price += 4*star
+            if v.find("Gangplank") != -1:
+                price += 5*star
+            if v.find("Graves") != -1:
+                price += 1*star
+            if v.find("Irelia") != -1:
+                price += 4*star
+            if v.find("JarvanIV") != -1:
+                price += 1*star
+            if v.find("Jayce") != -1:
+                price += 3*star
+            if v.find("Jhin") != -1:
+                price += 4*star
+            if v.find("Jinx") != -1:
+                price += 4*star
+            if v.find("KaiSa") != -1:
+                price += 2*star
+            if v.find("Karma") != -1:
+                price += 3*star
+            if v.find("Kassadin") != -1:
+                price += 3*star
+            if v.find("Kayle") != -1:
+                price += 4*star
+            if v.find("KhaZix") != -1:
+                price += 1*star
+            if v.find("Leona") != -1:
+                price += 1*star
+            if v.find("Lucian") != -1:
+                price += 2*star
+            if v.find("Lulu") != -1:
+                price += 5*star
+            if v.find("Lux") != -1:
+                price += 3*star
+            if v.find("Malphite") != -1:
+                price += 1*star
+            if v.find("MasterYi") != -1:
+                price += 3*star
+            if v.find("MissFortune") != -1:
+                price += 5*star
+            if v.find("Mordekaiser") != -1:
+                price += 2*star
+            if v.find("Neeko") != -1:
+                price += 3*star
+            if v.find("Poppy") != -1:
+                price += 1*star
+            if v.find("Rakan") != -1:
+                price += 2*star
+            if v.find("Rumble") != -1:
+                price += 3*star
+            if v.find("Shaco") != -1:
+                price += 3*star
+            if v.find("Shen") != -1:
+                price += 2*star
+            if v.find("Sona") != -1:
+                price += 2*star
+            if v.find("Soraka") != -1:
+                price += 4*star
+            if v.find("Syndra") != -1:
+                price += 3*star
+            if v.find("Thresh") != -1:
+                price += 5*star
+            if v.find("TwistedFate") != -1:
+                price += 1*star
+            if v.find("VelKoz") != -1:
+                price += 4*star
+            if v.find("Vi") != -1:
+                price += 3*star
+            if v.find("Wukong") != -1:
+                price += 4*star
+            if v.find("Xayah") != -1:
+                price += 1*star
+            if v.find("Xerath") != -1:
+                price += 5*star
+            if v.find("XinZhao") != -1:
+                price += 2*star
+            if v.find("Yasuo") != -1:
+                price += 2*star
+            if v.find("Ziggs") != -1:
+                price += 1*star
+            if v.find("Zoe") != -1:
+                price += 1*star
+        #print(str)
+        #print(price)
+
+def item_change(csv_data):
+    for i in range(1, len(csv_data)):
+        num = 0
+        step = 0
+        count = 0
+        str = csv_data['champion'][i]
+        str = str.replace(" ", "")
+        for j in range(len(str)):
+            if str[j] == '[':
+                step = 1
+                continue
+            if step == 1:
+                if str[j] == ']':
+                    if count == 2:
+                        num += 3
+                        count = 0
+                    if count == 1:
+                        num += 1
+                        count = 0
+                    step = 0
+                    continue
+                if str[j] == ',':
+                    if count == 2:
+                        num += 3
+                        count = 0
+                    if count == 1:
+                        num += 1
+                        count = 0
+                    continue
+                if str[j] != ',' or str[j] != ']':
+                    count += 1
         print(num)
 
 
-if __name__ == '__main__':
+def load_match_data(filename):
+    #filename is String
     names = ['gameId', 'gameDuration', 'level', 'lastRound', 'Ranked', 'ingameDuration', 'combination', 'champion']
-    csv_data = pd.read_csv("TFT_MatchData.csv", names=names, low_memory=False)
+    csv_data = pd.read_csv(filename, names=names, low_memory=False)
     csv_data.drop('gameId', axis=1, inplace=True)
     csv_data.drop('gameDuration', axis=1, inplace=True)
     csv_data.drop('ingameDuration', axis=1, inplace=True)
     csv_data.to_json("test.json", orient="records")
-    val = csv_data['combination'][1].find("DarkStar")
-    print(type(csv_data['champion'][1]))
+    return csv_data
+
+
+if __name__ == '__main__':
+    data = load_match_data("TFT_Challenger_MatchData.csv")
+    champion_data_change(data)
+    item_change(data)
