@@ -3,7 +3,9 @@ import json
 import pprint
 import pandas as pd
 
+
 def combination_data_change(csv_data):
+    list = []
     for i in range(1, len(csv_data)):
         num = 0
         str = csv_data['combination'][i]
@@ -122,10 +124,12 @@ def combination_data_change(csv_data):
         if str.find("Demolitionist") != -1:
             if int(str[str.find("Demolitionist") + 16]) >= 2:
                 num += 4
-        #print(csv_data['combination'][i])
-        #print(num)
+        list.append(num)
+    return list
+
 
 def champion_data_change(data):
+    array = []
     for i in range(1, len(data)):
         price = 0
         str = data['champion'][i]
@@ -244,10 +248,11 @@ def champion_data_change(data):
                 price += 1*star
             if v.find("Zoe") != -1:
                 price += 1*star
-        #print(str)
-        #print(price)
+        array.append(price)
+    return array
 
 def item_change(csv_data):
+    list_a = []
     for i in range(1, len(csv_data)):
         num = 0
         step = 0
@@ -278,7 +283,8 @@ def item_change(csv_data):
                     continue
                 if str[j] != ',' or str[j] != ']':
                     count += 1
-        print(num)
+        list_a.append(num)
+    return list_a
 
 
 def load_match_data(filename):
@@ -293,6 +299,7 @@ def load_match_data(filename):
 
 
 if __name__ == '__main__':
-    data = load_match_data("TFT_Challenger_MatchData.csv")
+    data = load_match_data("TFT_MatchData.csv")
+    #combination_data_change(data)
     champion_data_change(data)
-    item_change(data)
+    #item_change(data)
