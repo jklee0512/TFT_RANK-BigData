@@ -1,7 +1,6 @@
-import csv
-import json
-import pprint
+import matplotlib.pyplot as plt
 import pandas as pd
+from sklearn.model_selection import train_test_split
 
 def combination_data_change(csv_data):
     list = []
@@ -285,27 +284,80 @@ def item_change(csv_data):
     return list_a
 
 def load_match_data(filename):
-    #filename is String
     names = ['gameId', 'gameDuration', 'level', 'lastRound', 'Ranked', 'ingameDuration', 'combination', 'champion']
     csv_data = pd.read_csv(filename, names=names, low_memory=False)
     csv_data.drop('gameId', axis=1, inplace=True)
     csv_data.drop('gameDuration', axis=1, inplace=True)
     csv_data.drop('ingameDuration', axis=1, inplace=True)
     csv_data.drop(index = 0, axis = 0, inplace = True)
+    drop_empty_data(csv_data)
     csv_data.to_json("test.json", orient="records")
     data = pd.read_json("test.json")
     return data
 
-if __name__ == '__main__':
-    data = load_match_data("TFT_Challenger_MatchData.csv")
+def drop_empty_data(data):
+    str = "{}"
+    for i in range(1, len(data)):
+        str1 = data['champion'][i]
+        if str1 == str:
+            data.drop(index = i,axis = 0, inplace = True)
+
+def revice_data(data):
     combination_score = combination_data_change(data)
     champion_value = champion_data_change(data)
     item_count = item_change(data)
+
     df = pd.DataFrame()
     df["level"] = data["level"]
     df["lastRound"] = data["lastRound"]
-    df["Ranked"] = data["Ranked"]
+    #df["Ranked"] = data["Ranked"]
     df["item_count"] = item_count
     df["champion_value"] = champion_value
     df["combination_score"] = combination_score
-    print(df)
+    return df
+
+def plot_level(x, y):
+    plt.figure(figsize=(16, 8))
+    plt.title('level data')
+    plt.plot(x["level"], y, 'o', color='blue')
+    plt.ylim([0,9])
+    plt.show()
+
+def plot_lastRound(x, y):
+    plt.figure(figsize=(16, 8))
+    plt.title('lastRound data')
+    plt.plot(x["lastRound"], y, 'o', color='blue')
+    plt.ylim([0,9])
+    plt.show()
+
+def plot_cv(x, y):
+    plt.figure(figsize=(16, 8))
+    plt.title('champion value data')
+    plt.plot(x["champion_value"], y, 'o', color='blue')
+    plt.ylim([0,9])
+    plt.show()
+
+def plot_cs(x, y):
+    plt.figure(figsize=(16, 8))
+    plt.title('combination score data')
+    plt.plot(x["combination_score"], y, 'o', color='blue')
+    plt.ylim([0,9])
+    plt.show()
+
+def plot_ic(x, y):
+    plt.figure(figsize=(16, 8))
+    plt.title('item count data')
+    plt.plot(x["item_count"], y, 'o', color='blue')
+    plt.ylim([0,9])
+    plt.show()
+
+if __name__ == '__main__':
+    data = load_match_data("TFT_Challenger_MatchData.csv")
+    match_data = revice_data(data)
+    x_train, x_test, y_train, y_test = train_test_split(match_data, data["Ranked"], test_size=0.2, random_state=None, shuffle=True, stratify=None)
+
+    #plot_level(x_train, y_train)
+    #plot_lastRound(x_train, y_train)
+    #plot_cv(x_train, y_train)
+    #plot_cs(x_train, y_train)
+    #plot_ic(x_train, y_train)
