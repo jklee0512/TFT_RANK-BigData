@@ -368,75 +368,30 @@ def drop_empty_data(data):
             data.drop(index = i,axis = 0, inplace = True)
 
 def revice_data(data):
-    combination_score = combination_data_change(data)
-    champion_value = champion_data_change(data)
-    item_count = item_change(data)
 
     df = pd.DataFrame()
     df["level"] = data["level"]
-    df["lastRound"] = data["lastRound"]
-    df["item_count"] = item_count
-    df["champion_value"] = champion_value
-    df["combination_score"] = combination_score
-    #df["Ranked"] = data["Ranked"]
+    df["round"] = data["lastRound"]
+    df["combination"] = combination_data_change(data)
+    df["champion"] = champion_data_change(data)
+    df["item"] = item_change(data)
+    df["rank"] = data["Ranked"]
 
+    return df
+
+def normalize(data):
     nm = MinMaxScaler()
-    df_nm = nm.fit_transform(df)
-
-    #pd.DataFrame(df_nm, columns=["level", "lastRound"])
-    pd.DataFrame(df_nm, columns=["level", "lastRound", "item_count", "champion_value", "combination_score"])
-    #pd.DataFrame(df_nm, columns=["item_count", "champion_value", "combination_score"])
-
+    df = nm.fit_transform(data)
+    df_nm = pd.DataFrame(df, columns=["level", "round", "combination", "champion", "item", "Ranked"])
+    df_nm.drop('Ranked', axis=1, inplace=True)
     return df_nm
 
-def plot_level(x, y):
-    plt.figure(figsize=(16, 8))
-    plt.title('level data')
-    plt.plot(x["level"], y, 'o', color='blue')
-    plt.ylim([0,9])
-    plt.show()
-def plot_lastRound(x, y):
-    plt.figure(figsize=(16, 8))
-    plt.title('lastRound data')
-    plt.plot(x["lastRound"], y, 'o', color='blue')
-    plt.ylim([0,9])
-    plt.show()
-def plot_cv(x, y):
-    plt.figure(figsize=(16, 8))
-    plt.title('champion value data')
-    plt.plot(x["champion_value"], y, 'o', color='blue')
-    plt.ylim([0,9])
-    plt.show()
-def plot_cs(x, y):
-    plt.figure(figsize=(16, 8))
-    plt.title('combination score data')
-    plt.plot(x["combination_score"], y, 'o', color='blue')
-    plt.ylim([0,9])
-    plt.show()
-def plot_ic(x, y):
-    plt.figure(figsize=(16, 8))
-    plt.title('item count data')
-    plt.plot(x["item_count"], y, 'o', color='blue')
-    plt.ylim([0,9])
-    plt.show()
+def accurate_data(data):
+    # 분석을 위한 정규화 데이터
+    target = data["rank"]
+    nm_data = normalize(data)
 
-if __name__ == '__main__':
-    data = load_match_data("match_data.csv")
-    match_data = revice_data(data)
-    sunbang = []
-    for i in range(len(data)):
-        if data["Ranked"][i] == 1:
-            sunbang.append(1)
-        elif data["Ranked"][i] == 2:
-            sunbang.append(1)
-        elif data["Ranked"][i] == 3:
-            sunbang.append(1)
-        elif data["Ranked"][i] == 4:
-            sunbang.append(1)
-        else :
-            sunbang.append(0)
-
-    x_train, x_test, y_train, y_test = train_test_split(match_data, sunbang, test_size=0.2, random_state=None, shuffle=True, stratify=None)
+    x_train, x_test, y_train, y_test = train_test_split(nm_data, target, test_size=0.3, random_state=0, shuffle=True, stratify=target)
 
     model = GaussianNB()
     model.fit(x_train, y_train)
@@ -444,4 +399,56 @@ if __name__ == '__main__':
     expected = y_test
     predicate = model.predict(x_test)
     print(metrics.classification_report(y_test, predicate))
-    print("accuracy : {}".format((accuracy_score(y_test, predicate))))
+    print("rank accuracy : {}".format((accuracy_score(y_test, predicate))))
+    
+def accurate_sunbang(data):
+    # 분석을 위한 정규화 데이터
+    target = data["rank"]
+    nm_data = normalize(data)
+    sunbang = []
+    
+    for i in range(len(nm_data)):
+        if target[i]>0 and target[i]<5 :
+            sunbang.append(1)
+        else :
+            sunbang.append(0)
+
+    x_train, x_test, y_train, y_test = train_test_split(nm_data, sunbang, test_size=0.3, random_state=0, shuffle=True, stratify=sunbang)
+
+    model = GaussianNB()
+    model.fit(x_train, y_train)
+
+    expected = y_test
+    predicate = model.predict(x_test)
+    print(metrics.classification_report(y_test, predicate))
+    print("sunbang accuracy : {}".format((accuracy_score(y_test, predicate))))
+    
+def groupby_data(data):
+    group_rank = match_data.groupby('rank').mean()
+    display(group_rank)
+    return group_rank
+    
+def plot_avg(x, str):
+    title = str + " avg per Rank"
+    plt.figure(figsize=(16, 8))
+    plt.title(title)
+    plt.plot(x.index ,x[str], 'o--')
+    plt.show()
+
+if __name__ == '__main__':
+    data = load_match_data("match_data.csv")
+    #시각화를 위환 평균 매치 데이터
+    match_data = revice_data(data)
+    #등수별 평균 데이터
+    group_data = groupby_data(match_data)
+    
+    # 평균데이터 그래프 그리기
+    plot_avg(group_data, "level")
+    plot_avg(group_data, "round")
+    plot_avg(group_data, "combination")
+    plot_avg(group_data, "champion")
+    plot_avg(group_data, "item")
+    
+    # 모델의 정확도 출력
+    accurate_data(match_data)
+    accurate_sunbang(match_data)
