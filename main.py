@@ -258,8 +258,8 @@ def champion_data_change(data):
 
 def item_change(csv_data):
     list_a = []
-    tear_s = 2.3
-    tear_a = 2
+    tear_s = 2.5
+    tear_a = 2.0
     tear_b = 1.7
     tear_c = 1.4
     tear_d = 1
@@ -273,78 +273,96 @@ def item_change(csv_data):
         del l[-1]
         for v in l:
             v = v[v.find('[') + 1:v.find(']')]
-            if str.find('11') != -1:
+            if v.find('11') != -1:
                 num+=tear_a
-            if str.find('12') != -1:
+            if v.find('12') != -1:
                 num+=tear_s
-            if str.find('13') != -1:
+            if v.find('13') != -1:
                 num+=tear_c
-            if str.find('14') != -1:
+            if v.find('14') != -1:
                 num+=tear_b
-            if str.find('15') != -1:
+            if v.find('15') != -1:
                 num+=tear_s
-            if str.find('16') != -1:
+            if v.find('16') != -1:
                 num+=tear_b
-            if str.find('17') != -1:
+            if v.find('17') != -1:
                 num+=tear_b
-            if str.find('19') != -1:
+            if v.find('19') != -1:
                 num+=tear_a
-            if str.find('22') != -1:
+            if v.find('22') != -1:
                 num+=tear_c
-            if str.find('23') != -1:
+            if v.find('23') != -1:
                 num+=tear_b
-            if str.find('24') != -1:
+            if v.find('24') != -1:
                 num+=tear_b
-            if str.find('25') != -1:
+            if v.find('25') != -1:
                 num+=tear_a
-            if str.find('26') != -1:
+            if v.find('26') != -1:
                 num+=tear_b
-            if str.find('27') != -1:
+            if v.find('27') != -1:
                 num+=tear_c
-            if str.find('29') != -1:
+            if v.find('29') != -1:
                 num+=tear_b
-            if str.find('33') != -1:
+            if v.find('33') != -1:
                 num+=tear_b
-            if str.find('34') != -1:
+            if v.find('34') != -1:
                 num+=tear_c
-            if str.find('35') != -1:
+            if v.find('35') != -1:
                 num+=tear_b
-            if str.find('36') != -1:
+            if v.find('36') != -1:
                 num+=tear_s
-            if str.find('37') != -1:
+            if v.find('37') != -1:
                 num+=tear_s
-            if str.find('39') != -1:
+            if v.find('39') != -1:
                 num+=tear_a
-            if str.find('44') != -1:
+            if v.find('44') != -1:
                 num+=tear_s
-            if str.find('45') != -1:
+            if v.find('45') != -1:
                 num+=tear_d
-            if str.find('46') != -1:
+            if v.find('46') != -1:
                 num+=tear_c
-            if str.find('47') != -1:
+            if v.find('47') != -1:
                 num+=tear_c
-            if str.find('49') != -1:
+            if v.find('49') != -1:
                 num+=tear_s
-            if str.find('55') != -1:
+            if v.find('55') != -1:
                 num+=tear_b
-            if str.find('56') != -1:
+            if v.find('56') != -1:
                 num+=tear_d
-            if str.find('57') != -1:
+            if v.find('57') != -1:
                 num+=tear_s
-            if str.find('59') != -1:
+            if v.find('59') != -1:
                 num+=tear_b
-            if str.find('66') != -1:
+            if v.find('66') != -1:
                 num+=tear_a
-            if str.find('67') != -1:
+            if v.find('67') != -1:
                 num+=tear_s
-            if str.find('69') != -1:
+            if v.find('69') != -1:
                 num+=tear_c
-            if str.find('77') != -1:
+            if v.find('77') != -1:
                 num+=tear_b
-            if str.find('79') != -1:
+            if v.find('79') != -1:
                 num+=tear_b
-            if str.find('99') != -1:
+            if v.find('99') != -1:
                 num+=tear_a
+            if v.find('88') != -1:
+                num+=tear_s
+            if v.find('18') != -1:
+                num+=tear_d
+            if v.find('28') != -1:
+                num+=tear_d
+            if v.find('38') != -1:
+                num+=tear_d
+            if v.find('48') != -1:
+                num+=tear_d
+            if v.find('58') != -1:
+                num+=tear_d
+            if v.find('68') != -1:
+                num+=tear_d
+            if v.find('78') != -1:
+                num+=tear_d
+            if v.find('89') != -1:
+                num+=tear_d
         list_a.append(num)
     return list_a
 
@@ -430,7 +448,7 @@ def groupby_data(data):
     
 def plot_avg(x, str):
     title = str + " avg per Rank"
-    plt.figure(figsize=(16, 8))
+    plt.figure(figsize=(8, 4))
     plt.title(title)
     plt.plot(x.index ,x[str], 'o--')
     plt.show()
@@ -441,14 +459,3 @@ if __name__ == '__main__':
     match_data = revice_data(data)
     #등수별 평균 데이터
     group_data = groupby_data(match_data)
-    
-    # 평균데이터 그래프 그리기
-    plot_avg(group_data, "level")
-    plot_avg(group_data, "round")
-    plot_avg(group_data, "combination")
-    plot_avg(group_data, "champion")
-    plot_avg(group_data, "item")
-    
-    # 모델의 정확도 출력
-    accurate_data(match_data)
-    accurate_sunbang(match_data)
