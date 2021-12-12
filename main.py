@@ -4,6 +4,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import GaussianNB
 from sklearn import metrics
 from sklearn.metrics import accuracy_score
+from sklearn.preprocessing import MinMaxScaler
 
 def combination_data_change(csv_data):
     list = []
@@ -257,36 +258,93 @@ def champion_data_change(data):
 
 def item_change(csv_data):
     list_a = []
+    tear_s = 2.3
+    tear_a = 2
+    tear_b = 1.7
+    tear_c = 1.4
+    tear_d = 1
     for i in range(0, len(csv_data)):
         num = 0
         step = 0
         count = 0
         str = csv_data['champion'][i]
-        str = str.replace(" ", "")
-        for j in range(len(str)):
-            if str[j] == '[':
-                step = 1
-                continue
-            if step == 1:
-                if str[j] == ']':
-                    if count == 2:
-                        num += 1
-                        count = 0
-                    if count == 1:
-                        num += 5.5
-                        count = 0
-                    step = 0
-                    continue
-                if str[j] == ',':
-                    if count == 2:
-                        num += 1
-                        count = 0
-                    if count == 1:
-                        num += 5.5
-                        count = 0
-                    continue
-                if str[j] != ',' or str[j] != ']':
-                    count += 1
+        l = str.split("}")
+        del l[-1]
+        del l[-1]
+        for v in l:
+            v = v[v.find('[') + 1:v.find(']')]
+            if str.find('11') != -1:
+                num+=tear_a
+            if str.find('12') != -1:
+                num+=tear_s
+            if str.find('13') != -1:
+                num+=tear_c
+            if str.find('14') != -1:
+                num+=tear_b
+            if str.find('15') != -1:
+                num+=tear_s
+            if str.find('16') != -1:
+                num+=tear_b
+            if str.find('17') != -1:
+                num+=tear_b
+            if str.find('19') != -1:
+                num+=tear_a
+            if str.find('22') != -1:
+                num+=tear_c
+            if str.find('23') != -1:
+                num+=tear_b
+            if str.find('24') != -1:
+                num+=tear_b
+            if str.find('25') != -1:
+                num+=tear_a
+            if str.find('26') != -1:
+                num+=tear_b
+            if str.find('27') != -1:
+                num+=tear_c
+            if str.find('29') != -1:
+                num+=tear_b
+            if str.find('33') != -1:
+                num+=tear_b
+            if str.find('34') != -1:
+                num+=tear_c
+            if str.find('35') != -1:
+                num+=tear_b
+            if str.find('36') != -1:
+                num+=tear_s
+            if str.find('37') != -1:
+                num+=tear_s
+            if str.find('39') != -1:
+                num+=tear_a
+            if str.find('44') != -1:
+                num+=tear_s
+            if str.find('45') != -1:
+                num+=tear_d
+            if str.find('46') != -1:
+                num+=tear_c
+            if str.find('47') != -1:
+                num+=tear_c
+            if str.find('49') != -1:
+                num+=tear_s
+            if str.find('55') != -1:
+                num+=tear_b
+            if str.find('56') != -1:
+                num+=tear_d
+            if str.find('57') != -1:
+                num+=tear_s
+            if str.find('59') != -1:
+                num+=tear_b
+            if str.find('66') != -1:
+                num+=tear_a
+            if str.find('67') != -1:
+                num+=tear_s
+            if str.find('69') != -1:
+                num+=tear_c
+            if str.find('77') != -1:
+                num+=tear_b
+            if str.find('79') != -1:
+                num+=tear_b
+            if str.find('99') != -1:
+                num+=tear_a
         list_a.append(num)
     return list_a
 
@@ -315,13 +373,21 @@ def revice_data(data):
     item_count = item_change(data)
 
     df = pd.DataFrame()
-    #df["level"] = data["level"]
-    #df["lastRound"] = data["lastRound"]
+    df["level"] = data["level"]
+    df["lastRound"] = data["lastRound"]
     df["item_count"] = item_count
     df["champion_value"] = champion_value
     df["combination_score"] = combination_score
     #df["Ranked"] = data["Ranked"]
-    return df
+
+    nm = MinMaxScaler()
+    df_nm = nm.fit_transform(df)
+
+    #pd.DataFrame(df_nm, columns=["level", "lastRound"])
+    pd.DataFrame(df_nm, columns=["level", "lastRound", "item_count", "champion_value", "combination_score"])
+    #pd.DataFrame(df_nm, columns=["item_count", "champion_value", "combination_score"])
+
+    return df_nm
 
 def plot_level(x, y):
     plt.figure(figsize=(16, 8))
@@ -357,13 +423,25 @@ def plot_ic(x, y):
 if __name__ == '__main__':
     data = load_match_data("match_data.csv")
     match_data = revice_data(data)
-    x_train, x_test, y_train, y_test = train_test_split(match_data, data["Ranked"], test_size=0.2, random_state=None, shuffle=True, stratify=None)
+    sunbang = []
+    for i in range(len(data)):
+        if data["Ranked"][i] == 1:
+            sunbang.append(1)
+        elif data["Ranked"][i] == 2:
+            sunbang.append(1)
+        elif data["Ranked"][i] == 3:
+            sunbang.append(1)
+        elif data["Ranked"][i] == 4:
+            sunbang.append(1)
+        else :
+            sunbang.append(0)
+
+    x_train, x_test, y_train, y_test = train_test_split(match_data, sunbang, test_size=0.2, random_state=None, shuffle=True, stratify=None)
 
     model = GaussianNB()
     model.fit(x_train, y_train)
 
     expected = y_test
     predicate = model.predict(x_test)
-
     print(metrics.classification_report(y_test, predicate))
     print("accuracy : {}".format((accuracy_score(y_test, predicate))))
